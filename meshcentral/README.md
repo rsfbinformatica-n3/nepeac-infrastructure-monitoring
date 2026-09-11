@@ -1,5 +1,7 @@
 # MeshCentral
 
-O MeshCentral centraliza o gerenciamento remoto de estações autorizadas.
+MeshCentral foi implantado como componente de gestão remota, em configuração controlada e privada.
 
-Este repositório não publica certificados, chaves, dados dos agentes, grupos de dispositivos, registros de sessão ou configuração do servidor. A documentação futura deverá abordar apenas arquitetura e integração segura de dispositivos. Todos os procedimentos deverão ser sanitizados.
+## Status
+
+Serviço implantado/parcialmente configurado. A operação final depende de validações administrativas e políticas internas.

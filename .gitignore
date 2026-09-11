@@ -1,85 +1,45 @@
-# Credenciais e variáveis de ambiente
+# Secrets and credentials
 .env
 .env.*
-*.env
-*.secret
-*.secrets
-secrets/
-secret/
-credentials/
-credentials.*
-
-# Chaves, certificados privados e autenticação
 *.key
 *.pem
 *.p12
 *.pfx
-*.jks
-id_rsa*
-id_ed25519*
-authorized_keys
-known_hosts
-*.kubeconfig
+*.crt
+*.csr
+*.der
+secrets/
+credentials/
+private/
 
-# Bancos, dumps e estado persistente
+# Runtime state and databases
 *.db
-*.db-*
 *.sqlite
 *.sqlite3
-*.sql
+*.db-wal
+*.db-shm
+sessions/
+state/
+cache/
+logs/
+*.log
+
+# Dumps, backups and real data
 *.dump
-*.rdb
-*.aof
 *.bak
 *.backup
-*.snapshot
-
-# Backups e arquivos compactados
 backups/
-backup-data/
+restore-tests/
 *.tar
 *.tar.gz
 *.tgz
 *.zip
-*.7z
-*.gz
 
-# Logs, sessões, cookies e caches
-*.log
-logs/
-sessions/
-session/
-cookies/
-*.cookie
-.cache/
-cache/
-
-# Configurações locais e de produção
-config.local.*
-config.production.*
-compose.override.yaml
-docker-compose.override.yml
-inventory.local.*
-
-# Arquivos administrativos sensíveis
-RSFB-ACESSOS-*
-*-credentials.txt
-*-passwords.txt
-
-# Dependências e artefatos
-node_modules/
-__pycache__/
-*.py[cod]
-.venv/
-venv/
-dist/
-build/
-coverage/
-
-# Sistema e editores
+# System/editor noise
 .DS_Store
 Thumbs.db
 *.swp
-*.swo
-.idea/
-.vscode/
+*.tmp
+__pycache__/
+.pytest_cache/
+node_modules/

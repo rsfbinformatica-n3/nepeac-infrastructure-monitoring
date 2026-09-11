@@ -1,13 +1,11 @@
 # Scripts
 
-Este diretório receberá scripts sanitizados de instalação, validação e manutenção.
+Nenhum script operacional real foi incluído nesta etapa.
 
-Antes de adicionar um script:
+Motivo: os scripts desenvolvidos no ambiente contêm caminhos, políticas e validações específicas da infraestrutura privada. Antes de qualquer inclusão futura, cada script deve passar por:
 
-- remova endereços e caminhos internos
-- substitua credenciais por placeholders
-- evite copiar comandos do histórico de produção
-- documente pré-requisitos, impacto e procedimento de reversão
-- execute o ShellCheck ou uma validação equivalente quando aplicável
-
-Nenhum script operacional foi publicado nesta etapa.
+1. revisão manual;
+2. remoção de dados privados;
+3. parametrização de caminhos/IPs;
+4. secret scan;
+5. teste em ambiente isolado.

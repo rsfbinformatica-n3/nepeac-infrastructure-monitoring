@@ -1,12 +1,12 @@
 # Zabbix
 
-O Zabbix centraliza métricas, eventos, problemas e alertas da infraestrutura.
+Zabbix é a camada principal de monitoramento de infraestrutura.
 
-O escopo previsto inclui servidor, estações Windows, gateway, equipamentos compatíveis e serviços. Templates de produção, tokens, credenciais de banco e arquivos reais de configuração não fazem parte deste repositório.
+## Escopo documentado
 
-Próximas entregas sanitizadas:
+- disponibilidade do servidor;
+- métricas básicas;
+- hosts de infraestrutura confirmados;
+- base para interpretação operacional pelo Roberto.
 
-- inventário lógico de métricas
-- padrões de nomenclatura
-- exemplos de templates sem dados internos
-- documentação da integração com o Hermes Agent
+Credenciais, tokens, URLs internas reais e banco de dados não fazem parte desta versão pública.

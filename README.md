@@ -1,210 +1,159 @@
-# NEPEAC Infrastructure Monitoring
+# Infraestrutura e Monitoramento — NEPEAC
 
-> Plataforma open-source para monitoramento, observabilidade, gerenciamento remoto e automação da infraestrutura do NEPEAC.
+Este repositório documenta uma implantação real de infraestrutura, observabilidade, inventário técnico e proteção de dados realizada em um ambiente institucional de pequeno porte.
 
-## Sobre o projeto
+O objetivo é registrar uma arquitetura pragmática, reproduzível e auditável, usando ferramentas abertas e serviços leves para operar monitoramento, acesso remoto, inventário e backup com baixo custo operacional.
 
-Este repositório documenta a implantação de uma plataforma centralizada para acompanhar servidores, estações Windows, equipamentos de rede e serviços críticos. A solução prioriza ferramentas open-source, acesso remoto protegido e documentação reproduzível.
+> Esta versão é pública/sanitizada. Endereços, identificadores, seriais, patrimônios, tokens, credenciais, sessões, bancos e dados reais foram removidos ou substituídos por marcadores.
 
-A base de monitoramento e gerenciamento está implantada. A integração completa entre a API do Zabbix e o Hermes Agent permanece planejada. O backup centralizado das estações Windows também permanece em planejamento.
+## Contexto
 
-O repositório contém apenas documentação e exemplos sanitizados. Ele não armazena credenciais, endereços internos, bancos de dados, sessões, logs operacionais ou configurações de produção.
+O projeto parte de um servidor Ubuntu existente, reaproveitado como nó local de infraestrutura. A solução foi construída com foco em:
 
-## Arquitetura
+- observabilidade de serviços e rede;
+- documentação técnica atualizável;
+- inventário progressivo de ativos;
+- backup centralizado com validação por restore;
+- alertas e relatórios operacionais por Telegram;
+- operação segura, sem varreduras agressivas e sem exposição de segredos.
+
+## Arquitetura resumida
 
 ```mermaid
 flowchart TB
-    endpoints["Estações Windows e<br/>equipamentos de rede"]
-    zabbix["Zabbix<br/>Monitoramento e alertas"]
-    grafana["Grafana<br/>Observabilidade"]
-    hermes["Hermes Agent<br/>Consulta e interpretação"]
-    telegram["Telegram<br/>Interface administrativa e alertas"]
-    kuma["Uptime Kuma<br/>Disponibilidade"]
-    mesh["MeshCentral<br/>Gerenciamento remoto"]
-    tailscale["Tailscale<br/>Acesso remoto seguro"]
-    urbackup["UrBackup<br/>Backup automatizado<br/>Planejado"]
-    storage["HD externo<br/>Planejado"]
+    subgraph Rede_Local["Rede local institucional"]
+        Switch["Switch de acesso"]
+        Gateway["Gateway/Firewall"]
+        AP["Wi-Fi/APs"]
+        Endpoints["Desktops, notebooks e impressoras"]
+    end
 
-    endpoints --> zabbix
-    zabbix --> grafana
-    zabbix -. "integração via API planejada" .-> hermes
-    hermes -->|"interação administrativa implantada"| telegram
-    hermes -. "alertas inteligentes planejados" .-> telegram
+    subgraph NEPEAC01["Servidor NEPEAC01 - Ubuntu Server"]
+        Docker["Docker Compose"]
+        Zabbix["Zabbix"]
+        Grafana["Grafana"]
+        Kuma["Uptime Kuma"]
+        Mesh["MeshCentral"]
+        UrBackup["UrBackup Server"]
+        Roberto["Hermes Agent / Roberto"]
+        Inventory["Inventário estruturado"]
+    end
 
-    endpoints --> kuma
-    endpoints --> mesh
+    subgraph Backup["Storage externo dedicado"]
+        BackupDisk["<BACKUP_STORAGE_PATH>"]
+    end
 
-    tailscale -. "protege o acesso administrativo" .-> zabbix
-    tailscale -. "protege o acesso administrativo" .-> grafana
-    tailscale -. "protege o acesso administrativo" .-> kuma
-    tailscale -. "protege o acesso administrativo" .-> mesh
+    subgraph Operacao["Operação"]
+        Telegram["Telegram"]
+        Admin["Acesso privado via VPN mesh"]
+    end
 
-    endpoints -. "etapa planejada" .-> urbackup
-    urbackup -. "armazenamento planejado" .-> storage
-    urbackup -. "estado dos backups" .-> zabbix
+    Endpoints --> Switch
+    AP --> Switch
+    Switch --> Gateway
+    Switch --> NEPEAC01
+    Docker --> Zabbix
+    Docker --> Grafana
+    Docker --> Kuma
+    Docker --> Mesh
+    Docker --> UrBackup
+    UrBackup --> BackupDisk
+    Zabbix --> Roberto
+    Kuma --> Roberto
+    UrBackup --> Roberto
+    Inventory --> Roberto
+    Roberto --> Telegram
+    Admin --> NEPEAC01
 ```
-
-O Zabbix concentra métricas e eventos. O Grafana organiza a visualização. O Hermes Agent deverá consultar a API do Zabbix antes de interpretar o estado do ambiente. O Telegram funciona como interface administrativa e canal planejado para alertas inteligentes.
-
-O Uptime Kuma executa verificações de disponibilidade. O MeshCentral centraliza o acesso remoto autorizado. O Tailscale protege as interfaces administrativas sem exposição pública direta.
 
 ## Tecnologias
 
-| Tecnologia | Função no projeto | Estado |
-| --- | --- | --- |
-| Ubuntu Server 22.04 LTS | Sistema operacional do servidor central | Implantado |
-| Zabbix | Coleta de métricas, monitoramento de hosts, eventos e alertas | Implantado |
-| Grafana | Dashboards e visualização dos dados de monitoramento | Implantado |
-| Uptime Kuma | Verificações de disponibilidade, latência e serviços | Implantado |
-| MeshCentral | Gerenciamento remoto autorizado das estações | Implantado |
-| Tailscale | Rede privada para acesso administrativo | Implantado |
-| Hermes Agent | Camada inteligente de consulta, análise e interpretação | Base implantada |
-| Telegram | Interface entre o administrador e o Hermes Agent | Implantado |
-| UrBackup | Backup centralizado das estações Windows | Planejado |
+- **Ubuntu Server** como base operacional.
+- **Docker Compose** para orquestração local dos serviços.
+- **Zabbix** para monitoramento de infraestrutura.
+- **Grafana** para visualização de métricas.
+- **Uptime Kuma** para checks simples de disponibilidade.
+- **MeshCentral** para gestão remota, em configuração controlada.
+- **Tailscale** para acesso privado administrativo.
+- **UrBackup** para backup centralizado em storage dedicado.
+- **Hermes Agent / Roberto** para relatórios e interpretação operacional.
+- **Inventário JSON/CSV/Markdown** como fonte determinística de documentação.
 
-## Monitoramento
+## Monitoramento e Roberto
 
-### Base implantada
+Roberto é o agente operacional responsável por consolidar dados de fontes determinísticas e comunicar o estado do ambiente. Ele não é a fonte da verdade: interpreta informações vindas de Zabbix, Uptime Kuma, UrBackup, métricas locais e inventário estruturado.
 
-A base atual inclui o agente Zabbix no servidor, o servidor de monitoramento, a visualização pelo Grafana, o mecanismo de verificações do Uptime Kuma e o gerenciamento remoto pelo MeshCentral. Cada novo host ou equipamento deve passar por cadastro e validação antes de ser considerado monitorado.
+Os relatórios programados foram desenhados para serem curtos e acionáveis, evitando ruído. Alertas críticos permanecem separados e devem usar deduplicação/cooldown.
 
-### Cobertura planejada
+## Backup
 
-A evolução da plataforma deverá acompanhar:
+O UrBackup Server foi preparado para gravar em um storage externo montado de forma controlada. A implantação inclui proteção para evitar que backups sejam gravados no disco raiz caso o volume de backup não esteja montado.
 
-- disponibilidade dos hosts
-- estado do servidor central
-- utilização de CPU
-- utilização de memória RAM
-- capacidade e uso do armazenamento
-- disponibilidade de serviços HTTP e TCP
-- latência e perda de pacotes
-- disponibilidade do gateway
-- equipamentos de rede compatíveis
-- estações Windows
-- estado e validade dos backups, após a implantação do UrBackup
+Status público do backup:
 
-Métricas detalhadas de Wi-Fi dependem de suporte a Simple Network Management Protocol (SNMP), controlador ou interface de programação de aplicações (API) no equipamento de rede.
+- servidor preparado: concluído;
+- storage dedicado: em validação;
+- piloto Windows com restore e hash: pendente.
 
-## Hermes Agent
+## Inventário
 
-A arquitetura separa coleta, visualização e interpretação:
+O inventário é mantido em estrutura determinística e atualizável. A descoberta de ativos utiliza fontes passivas ou controladas, como LLDP, ARP/neighbour table, ICMP leve, serviços já existentes e confirmação física posterior.
 
-1. **Zabbix** registra métricas, eventos e problemas.
-2. **Grafana** apresenta dashboards baseados nos dados disponíveis.
-3. **Hermes Agent** consulta fontes autorizadas e interpreta o resultado.
-4. **Telegram** entrega consultas e alertas ao administrador.
+Esta versão pública inclui apenas exemplos sanitizados em `inventory/`.
 
-O Hermes Agent deve consultar dados reais antes de responder perguntas sobre o ambiente. Ele não deve inferir disponibilidade, incidentes ou backups sem evidência atual das fontes de monitoramento.
+## Segurança
 
-Exemplos de consultas previstas:
+A publicação deste repositório não inclui:
 
-- “Como está a rede?”
-- “Existem máquinas offline?”
-- “Qual é o estado do servidor?”
-- “Quais problemas estão ativos?”
-- “Quando foi o último backup do PC identificado no inventário?”
+- credenciais;
+- tokens;
+- bancos de dados;
+- logs brutos;
+- sessões Hermes;
+- chaves SSH;
+- chaves MOK;
+- seriais/patrimônios reais;
+- IPs/MACs reais;
+- dados de usuários ou estações.
 
-A integração completa entre a API do Zabbix e o Hermes Agent permanece no roadmap.
+## Status atual
 
-## Backup automatizado: planejado
+### Concluído
 
-A arquitetura planejada usa o UrBackup para centralizar cópias das estações Windows em um HD externo:
+- base Ubuntu Server em operação;
+- stack Docker Compose implantada;
+- Zabbix implantado;
+- Grafana implantado;
+- Uptime Kuma implantado;
+- UrBackup Server implantado;
+- documentação inicial da rede e inventário;
+- descoberta controlada inicial de redes cabeada e Wi-Fi;
+- Roberto/Hermes Agent operando como camada de relatório.
 
-```mermaid
-flowchart LR
-    windows["Estações Windows"] --> urbackup["UrBackup"]
-    urbackup --> external["HD externo"]
-    urbackup -. "estado e falhas" .-> zabbix["Zabbix"]
-    zabbix -. "dados de backup, integração planejada" .-> hermes["Hermes Agent"]
-    hermes -. "alertas inteligentes planejados" .-> telegram["Telegram"]
-```
+### Em validação
 
-Objetivos da etapa:
+- MeshCentral: serviço implantado, configuração operacional final em validação;
+- UrBackup: piloto de backup/restore em estação Windows pendente;
+- inventário: enriquecimento físico progressivo;
+- sensor Wi-Fi do Roberto: driver preparado, validação final pendente.
 
-- backup automático
-- cópias incrementais
-- versionamento
-- restauração de arquivos e sistemas
-- política de retenção
-- monitoramento do UrBackup pelo Zabbix
-- alertas pelo Hermes Agent e Telegram
-- testes automatizados de restauração
+### Planejado
 
-Esta seção descreve uma arquitetura planejada. O UrBackup e o HD externo ainda não integram o ambiente de produção.
+- validação completa de restore com SHA-256;
+- refinamento de dashboards;
+- cadastro gradual de endpoints confirmados;
+- relatório operacional com inventário enriquecido;
+- documentação de procedimentos de manutenção.
 
-## Hardware atual
+## Wazuh
 
-O servidor utiliza hardware reaproveitado e adequado à etapa inicial do projeto:
-
-| Componente | Especificação |
-| --- | --- |
-| Processador | Intel Core 2 Duo E4600, 2 núcleos, 2,40 GHz |
-| Placa-mãe | Intel DG31PR |
-| Memória RAM | 2 GB instalados, com expansão planejada para 4 GB |
-| Armazenamento interno | WD Blue 500 GB |
-| Armazenamento de backup | HD externo planejado |
-
-Números de série, identificadores de hardware e endereços de rede não fazem parte da documentação pública.
-
-## Estrutura do repositório
-
-```text
-.
-├── backup/
-├── docs/
-├── examples/
-├── grafana/
-├── hermes/
-├── meshcentral/
-├── scripts/
-├── uptime-kuma/
-├── zabbix/
-├── .gitignore
-├── README.md
-└── SECURITY.md
-```
-
-Cada diretório contém documentação sanitizada sobre seu componente. Arquivos operacionais somente serão adicionados após revisão individual.
-
-## Segurança da publicação
-
-Este projeto segue uma política de publicação mínima:
-
-- não copiar diretórios de produção
-- não publicar arquivos `.env`
-- não publicar senhas, tokens, cookies, sessões ou chaves
-- não publicar IPs internos, identificadores únicos ou dados pessoais
-- não publicar bancos, dumps, backups ou logs
-- não publicar configurações com credenciais embutidas
-- usar placeholders reconhecíveis em qualquer exemplo futuro
-- revisar individualmente cada arquivo antes do commit
-- executar varredura de segredos antes de qualquer push
-
-Consulte [`SECURITY.md`](SECURITY.md) para conhecer as regras de contribuição e relato de vulnerabilidades.
+Wazuh foi avaliado como alternativa de segurança/SIEM/XDR, mas não foi implantado neste host. A decisão técnica foi descartar a instalação local por limitação de recursos disponíveis, mantendo a possibilidade de uma arquitetura centralizada em outro servidor/VM no futuro.
 
 ## Roadmap
 
-- [x] Ubuntu Server 22.04 LTS
-- [x] Zabbix
-- [x] Grafana
-- [x] Uptime Kuma
-- [x] MeshCentral
-- [x] Tailscale
-- [x] Hermes Agent instalado
-- [x] Telegram como interface administrativa
-- [ ] Upgrade para 4 GB de RAM
-- [ ] Implantar backup centralizado com UrBackup
-- [ ] HD externo dedicado aos backups
-- [ ] Monitoramento dos backups pelo Zabbix
-- [ ] Integração completa entre Zabbix API e Hermes Agent
-- [ ] Alertas inteligentes pelo Telegram
-- [ ] Testes automatizados de restauração
-
-## Licença
-
-Este projeto usa a **Apache License 2.0**. A licença permite uso, modificação e redistribuição, além de incluir uma concessão explícita de patentes. Consulte [`LICENSE`](LICENSE) para ler os termos completos.
-
-## Status
-
-O repositório está em preparação e ainda não foi publicado. A documentação será atualizada conforme o ambiente evoluir e cada etapa for validada.
+1. Concluir piloto UrBackup com restore real.
+2. Confirmar fisicamente ativos pendentes do inventário.
+3. Validar sensor Wi-Fi dedicado do Roberto.
+4. Consolidar dashboards e relatórios curtos.
+5. Documentar rotina de manutenção e recuperação.
+6. Avaliar publicação do repositório após revisão final.
