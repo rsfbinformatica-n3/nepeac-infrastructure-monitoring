@@ -28,7 +28,7 @@ flowchart TB
         Endpoints["Desktops, notebooks e impressoras"]
     end
 
-    subgraph NEPEAC01["Servidor NEPEAC01 - Ubuntu Server"]
+    subgraph <MONITORING_SERVER>["Servidor <MONITORING_SERVER> - Ubuntu Server"]
         Docker["Docker Compose"]
         Zabbix["Zabbix"]
         Grafana["Grafana"]
@@ -51,7 +51,7 @@ flowchart TB
     Endpoints --> Switch
     AP --> Switch
     Switch --> Gateway
-    Switch --> NEPEAC01
+    Switch --> <MONITORING_SERVER>
     Docker --> Zabbix
     Docker --> Grafana
     Docker --> Kuma
@@ -63,7 +63,7 @@ flowchart TB
     UrBackup --> Roberto
     Inventory --> Roberto
     Roberto --> Telegram
-    Admin --> NEPEAC01
+    Admin --> <MONITORING_SERVER>
 ```
 
 ## Tecnologias

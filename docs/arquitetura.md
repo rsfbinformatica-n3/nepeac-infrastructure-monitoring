@@ -15,7 +15,7 @@ A arquitetura combina serviços locais em Docker Compose, acesso administrativo 
 
 ```mermaid
 flowchart LR
-    Host["NEPEAC01\nUbuntu Server"] --> Docker["Docker Compose"]
+    Host["<MONITORING_SERVER>\nUbuntu Server"] --> Docker["Docker Compose"]
     Docker --> Zabbix
     Docker --> Grafana
     Docker --> Kuma["Uptime Kuma"]

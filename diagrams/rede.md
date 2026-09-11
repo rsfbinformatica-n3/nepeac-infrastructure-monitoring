@@ -4,7 +4,7 @@
 flowchart LR
     Internet["Internet"] --> Gateway["Gateway/Firewall"]
     Gateway --> Switch["Switch de acesso"]
-    Switch --> Server["NEPEAC01"]
+    Switch --> Server["<MONITORING_SERVER>"]
     Switch --> Printers["Impressoras"]
     Switch --> PCs["Desktops/Notebooks"]
     Switch --> APs["Wi-Fi/APs"]
